@@ -9,65 +9,127 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-
+import * as ImagePicker from "expo-image-picker";
+import RNPickerSelect from "react-native-picker-select";
 import { useState, useEffect } from "react";
+
 export default function Product() {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
-
+  const [selectecCategory, setSelectedCategory] = useState("All");
   //form data
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  const [imageUri, setImageUri] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   //useEffect to fetch products
   useEffect(() => {
-    async function fetchProdcuts() {
+    async function fetchProducts() {
       const response = await fetch("https://fakestoreapi.com/products");
       const data = await response.json();
       setProducts(data);
       setLoading(false);
     }
-    fetchProdcuts();
+    fetchProducts();
   }, []);
 
   // on clicking image
   const handleImagePress = (item) => {
     // router.push(`/products/${item.id}`);
   };
+
   const handleAddProduct = () => {
     setIsFormOpen(!isFormOpen);
   };
+
+  function handleSort() {
+    const sortedArray = [...filteredProducts].sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a.price - b.price;
+      } else {
+        return b.price - a.price;
+      }
+    });
+    setSortedItems(sortedArray);
+  }
+
   const handleSubmit = () => {
     let newProductDetails = {
       id: products[products.length - 1].id + 1,
       title: title,
       description: description,
       price: price,
+      image: imageUri, // Adding the image URI to the new product
     };
     setIsFormOpen(false);
     setProducts([newProductDetails, ...products]);
     setTitle("");
     setDescription("");
     setPrice("");
+    setImageUri("");
     console.log(newProductDetails);
   };
 
-  const handleDelte = (productId) => {
+  async function toAskPermission() {
+    const result = await ImagePicker.requestCameraPermissionsAsync();
+    if (!result.granted) {
+      alert("You need to enable permission to access the camera roll.");
+    }
+  }
+
+  useEffect(() => {
+    toAskPermission();
+  }, []);
+
+  async function selectImage() {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        console.log(result); // Logging the result to debug
+        setImageUri(result.assets[0].uri); // Accessing the URI of the selected image
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const handleDelete = (productId) => {
     let newProducts = products.filter((product) => {
       return product.id !== productId;
     });
-
     setProducts(newProducts);
   };
+
+  //useEffect to handle search products
+  useEffect(() => {
+    let convertedSearchValue = searchValue.toLowerCase();
+    let newSearchedProducts = products.filter((product) => {
+      return product.title.toLowerCase().includes(convertedSearchValue);
+    });
+    setFilteredProducts(newSearchedProducts);
+  }, [searchValue, products]);
+
+  useEffect(() => {
+    console.log(selectecCategory, "sd");
+  }, [selectecCategory]);
+
   const renderItem = ({ item }) => (
     <View style={styles.item}>
       <TouchableOpacity onPress={() => handleImagePress(item)}>
         {item.image ? (
           <Image style={styles.image} source={{ uri: item.image }} />
         ) : (
-          <Text>"NO IMAGE"</Text>
+          <Text>No Image</Text>
         )}
       </TouchableOpacity>
 
@@ -87,26 +149,14 @@ export default function Product() {
           <Button
             title="Delete Product"
             onPress={() => {
-              handleDelte(item.id);
-            }}
-          />
-        </View>
-
-        <View
-          style={{
-            flex: 0.5,
-          }}
-        >
-          <Button
-            title="Delete Product"
-            onPress={() => {
-              handleDelte(item.id);
+              handleDelete(item.id);
             }}
           />
         </View>
       </View>
     </View>
   );
+
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -114,15 +164,42 @@ export default function Product() {
       </View>
     );
   }
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Products</Text>
       <Button
         title={`${isFormOpen ? "Close Form" : "Add Product"}`}
         onPress={handleAddProduct}
-      ></Button>
+      />
+      <Button title="Select Image" onPress={selectImage} />
+      {imageUri ? (
+        <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
+      ) : null}
+      <TextInput
+        style={[styles.input, { marginTop: 30, borderRadius: 5 }]}
+        placeholder="Search products..."
+        value={searchValue}
+        onChangeText={setSearchValue}
+      />
+      <RNPickerSelect
+        onValueChange={(value) => setSelectedCategory(value)}
+        items={[
+          { label: "Womens", value: "Womens" },
+          { label: "Mens", value: "Mens" },
+          { label: "clothing", value: "clothing" },
+        ]}
+      />
+
+      <RNPickerSelect
+        onValueChange={(value) => setSelectedCategory(value)}
+        items={[
+          { label: "High to Low", value: "asc" },
+          { label: "Low to High", value: "dec" },
+        ]}
+      />
       {isFormOpen && (
-        <View style={styles.Formcontainer}>
+        <View style={styles.formContainer}>
           <TextInput
             style={styles.input}
             placeholder="Title"
@@ -149,7 +226,7 @@ export default function Product() {
 
       <View style={styles.listContainer}>
         <FlatList
-          data={products}
+          data={filteredProducts}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.list}
@@ -165,7 +242,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#fff",
   },
-  Formcontainer: {
+  formContainer: {
     marginTop: 20,
   },
   input: {
