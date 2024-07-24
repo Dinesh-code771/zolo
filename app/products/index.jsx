@@ -12,13 +12,21 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import RNPickerSelect from "react-native-picker-select";
 import { useState, useEffect } from "react";
-
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setProducts, setIsEditMode } from "../../redux/productsSlice";
+import { useNavigation } from "@react-navigation/native";
+import { router } from "expo-router";
 export default function Product() {
-  const [products, setProducts] = useState([]);
+  const { products } = useSelector((state) => state.products);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectecCategory, setSelectedCategory] = useState("All");
+  const dispatch = useDispatch();
+  const user = useSelector((state) => {
+    return state.user;
+  });
   //form data
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
@@ -26,13 +34,13 @@ export default function Product() {
   const [imageUri, setImageUri] = useState("");
   const [sortOrder, setSortOrder] = useState("");
   const [searchValue, setSearchValue] = useState("");
-
+  const navigate = useNavigation();
   //useEffect to fetch products
   useEffect(() => {
     async function fetchProducts() {
       const response = await fetch("https://fakestoreapi.com/products");
       const data = await response.json();
-      setProducts(data);
+      dispatch(setProducts(data));
       setLoading(false);
     }
     fetchProducts();
@@ -40,7 +48,9 @@ export default function Product() {
 
   // on clicking image
   const handleImagePress = (item) => {
-    // router.push(`/products/${item.id}`);
+    console.log("clikced");
+    router.push(`/products/${item.id}`);
+    dispatch(setIsEditMode(false));
   };
 
   const handleAddProduct = () => {
@@ -67,7 +77,7 @@ export default function Product() {
       image: imageUri, // Adding the image URI to the new product
     };
     setIsFormOpen(false);
-    setProducts([newProductDetails, ...products]);
+    dispatch(setProducts([newProductDetails, ...products]));
     setTitle("");
     setDescription("");
     setPrice("");
@@ -85,6 +95,11 @@ export default function Product() {
   useEffect(() => {
     toAskPermission();
   }, []);
+
+  function handleEdit(productId) {
+    router.push(`/products/${productId}`);
+    dispatch(setIsEditMode(true));
+  }
 
   async function selectImage() {
     try {
@@ -107,7 +122,7 @@ export default function Product() {
     let newProducts = products.filter((product) => {
       return product.id !== productId;
     });
-    setProducts(newProducts);
+    dispatch(setProducts(newProducts));
   };
 
   //useEffect to handle search products
@@ -139,17 +154,31 @@ export default function Product() {
         style={{
           flex: 1,
           flexDirection: "row",
+          justifyContent: "space-between",
         }}
       >
         <View
           style={{
-            flex: 0.5,
+            flex: 1,
           }}
         >
           <Button
+            color={"red"}
             title="Delete Product"
             onPress={() => {
               handleDelete(item.id);
+            }}
+          />
+        </View>
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+          <Button
+            title="Edit Product"
+            onPress={() => {
+              handleEdit(item.id);
             }}
           />
         </View>
@@ -168,6 +197,7 @@ export default function Product() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Products</Text>
+      <Text style={styles.header}>{user.name}</Text>
       <Button
         title={`${isFormOpen ? "Close Form" : "Add Product"}`}
         onPress={handleAddProduct}

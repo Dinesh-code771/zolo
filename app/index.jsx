@@ -2,13 +2,18 @@ import { Text, View, Button, StyleSheet, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Link } from "expo-router";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setUser, setUserPassword } from "@/redux/userSlice";
 export default function Index() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
-  const handleLogin = () => {
+  const dispatch = useDispatch();
+  function handleLogin() {
+    dispatch(setUser(name));
+    dispatch(setUserPassword(password));
     navigation.navigate("products/index");
-  };
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Name:</Text>

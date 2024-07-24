@@ -1,11 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TextInput,
+  Button,
+} from "react-native";
 import { useRoute } from "@react-navigation/native";
-import { products } from "../dataProducts";
-
+import { useDispatch, useSelector } from "react-redux";
+import { setProducts } from "../../redux/productsSlice";
+import { useRouter } from "expo-router";
 export default function ProductDetails() {
+  const { products } = useSelector((state) => state.products);
+  const { isEditMode } = useSelector((state) => state.products);
   const [productDetails, setProductDetails] = useState(null);
+  const dispatch = useDispatch();
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
   const route = useRoute();
+  const router = useRouter();
   const { productId } = route.params;
 
   useEffect(() => {
@@ -16,7 +32,14 @@ export default function ProductDetails() {
     if (product) {
       setProductDetails(product);
     }
-  }, [productId]);
+  }, [productId, products]);
+
+  useEffect(() => {
+    setTitle(productDetails?.title);
+    console.log(productDetails?.price);
+    setPrice(productDetails?.price);
+    setDescription(productDetails?.description);
+  }, [productDetails]);
 
   if (!productDetails) {
     return (
@@ -26,12 +49,65 @@ export default function ProductDetails() {
     );
   }
 
+  function handleSaveChanges() {
+    console.log(title, "ds");
+    let EditTedProducts = products.map((product) => {
+      return product.id === parseInt(productId)
+        ? { ...product, title: title, price: price, description: description }
+        : product;
+    });
+
+    dispatch(setProducts(EditTedProducts));
+    router.back();
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image style={styles.image} source={{ uri: productDetails.image }} />
-      <Text style={styles.title}>{productDetails.title}</Text>
-      <Text style={styles.price}>${productDetails.price}</Text>
-      <Text style={styles.description}>{productDetails.description}</Text>
+      {!isEditMode ? (
+        <Text style={styles.title}>{productDetails.title}</Text>
+      ) : (
+        <TextInput
+          style={[styles.input, { borderRadius: 5 }]}
+          placeholder="Search products..."
+          value={title ? title : ""}
+          onChangeText={setTitle}
+        />
+      )}
+      {!isEditMode ? (
+        <Text style={styles.price}>${productDetails.price}</Text>
+      ) : (
+        <TextInput
+          style={styles.input}
+          placeholder="Price"
+          value={price}
+          onChangeText={setPrice}
+          keyboardType="numeric"
+        />
+      )}
+      {!isEditMode ? (
+        <Text style={styles.description}>{productDetails.description}</Text>
+      ) : (
+        <TextInput
+          multiline={true}
+          numberOfLines={4}
+          style={[styles.input, styles.description, { height: 100 }]}
+          value={description}
+          onChangeText={setDescription}
+        />
+      )}
+
+      {isEditMode ? (
+        <View
+          style={{
+            width: "100%",
+          }}
+        >
+          <Button onPress={handleSaveChanges} title="Sava changes"></Button>
+        </View>
+      ) : (
+        ""
+      )}
     </ScrollView>
   );
 }
@@ -49,6 +125,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginVertical: 8,
+    width: "100%",
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 8,
+    width: "100%",
   },
   price: {
     fontSize: 20,
