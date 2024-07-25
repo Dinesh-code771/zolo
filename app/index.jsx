@@ -8,28 +8,80 @@ export default function Index() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+  const [errorDetails, setErrorDetails] = useState({
+    nameError: "",
+    passwordError: "",
+  });
   const dispatch = useDispatch();
+
+  
+  let isEveryThingGood = true;
+  function checkPasswordValidate(password) {
+    if (password.length >= 8) {
+      return "";
+    } else {
+      isEveryThingGood = false;
+      return "Password should be Greateer than 8 char";
+    }
+  }
+  function handleValidation() {
+    if (name.length === 0 || password.length === 0) {
+      isEveryThingGood = false;
+      setErrorDetails({
+        passwordError:
+          password.length === 0
+            ? "Password is required"
+            : checkPasswordValidate(password),
+        nameError: name.length === 0 ? "Name is required" : "",
+      });
+    } else if (password.length > 0) {
+      setErrorDetails({
+        nameError: name.length === 0 ? "Name is required" : "",
+        passwordError: checkPasswordValidate(password),
+      });
+    }
+    return isEveryThingGood;
+  }
   function handleLogin() {
-    dispatch(setUser(name));
-    dispatch(setUserPassword(password));
-    navigation.navigate("products/index");
+    let isEveryThingGood = handleValidation();
+    if (isEveryThingGood) {
+      dispatch(setUser(name));
+      dispatch(setUserPassword(password));
+      setName("");
+      setPassword("");
+      navigation.navigate("products/index");
+    }
   }
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Name:</Text>
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-        placeholder="Enter your name"
-      />
-      <Text style={styles.label}>Password:</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Enter your name"
-      />
+      <View style={{ marginBottom: 15 }}>
+        <Text style={styles.label}>Name:</Text>
+        <TextInput
+          style={styles[errorDetails.nameError ? "errorInput" : "input"]}
+          value={name}
+          onChangeText={setName}
+          placeholder="Enter your name"
+        />
+        {errorDetails.nameError && (
+          <Text style={styles.error}>{errorDetails.nameError}</Text>
+        )}
+      </View>
+      <View
+        style={{
+          marginBottom: 15,
+        }}
+      >
+        <Text style={styles.label}>Password:</Text>
+        <TextInput
+          style={styles[errorDetails.passwordError ? "errorInput" : "input"]}
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Enter your name"
+        />
+        {errorDetails.passwordError && (
+          <Text style={styles.error}>{errorDetails.passwordError}</Text>
+        )}
+      </View>
       <Button title="Login" onPress={handleLogin} />
     </View>
   );
@@ -51,5 +103,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
+  },
+  errorInput: {
+    height: 40,
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 8,
+    borderColor: "red",
+  },
+  error: {
+    color: "red",
   },
 });
