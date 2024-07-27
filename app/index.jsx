@@ -1,8 +1,10 @@
 import { Text, View, Button, StyleSheet, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Link } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Route } from "expo-router/build/Route";
+import { router } from "expo-router";
 import { setUser, setUserPassword } from "@/redux/userSlice";
 export default function Index() {
   const [name, setName] = useState("");
@@ -14,7 +16,6 @@ export default function Index() {
   });
   const dispatch = useDispatch();
 
-  
   let isEveryThingGood = true;
   function checkPasswordValidate(password) {
     if (password.length >= 8) {
@@ -47,11 +48,27 @@ export default function Index() {
     if (isEveryThingGood) {
       dispatch(setUser(name));
       dispatch(setUserPassword(password));
+      AsyncStorage.setItem("userName", name);
+      AsyncStorage.setItem("userPassword", password);
+
       setName("");
       setPassword("");
       navigation.navigate("products/index");
     }
   }
+  // check if user is already logged in
+  useEffect(() => {
+    async function getLoginDetails() {
+      const savedUser = await AsyncStorage.getItem("userName");
+      const password = await AsyncStorage.getItem("userPassword");
+      console.log(savedUser, password);
+      if (savedUser && password) {
+        console.log("entered");
+        navigation.navigate("products/index");
+      }
+    }
+    getLoginDetails();
+  }, []);
   return (
     <View style={styles.container}>
       <View style={{ marginBottom: 15 }}>

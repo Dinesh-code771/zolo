@@ -91,7 +91,7 @@ export default function Product() {
       alert("You need to enable permission to access the camera roll.");
     }
   }
-
+  // this run on component mount
   useEffect(() => {
     toAskPermission();
   }, []);
