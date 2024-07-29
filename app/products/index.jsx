@@ -22,6 +22,7 @@ export default function Product() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const navigation = useNavigation();
   const [selectecCategory, setSelectedCategory] = useState("All");
   const dispatch = useDispatch();
   const user = useSelector((state) => {
@@ -82,7 +83,6 @@ export default function Product() {
     setDescription("");
     setPrice("");
     setImageUri("");
-    console.log(newProductDetails);
   };
 
   async function toAskPermission() {
@@ -93,7 +93,7 @@ export default function Product() {
   }
   // this run on component mount
   useEffect(() => {
-    toAskPermission();
+    // toAskPermission();
   }, []);
 
   function handleEdit(productId) {
@@ -203,6 +203,12 @@ export default function Product() {
         onPress={handleAddProduct}
       />
       <Button title="Select Image" onPress={selectImage} />
+      <Button
+        title="Post screen"
+        onPress={() => {
+          navigation.navigate("posts/index");
+        }}
+      />
       {imageUri ? (
         <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
       ) : null}
