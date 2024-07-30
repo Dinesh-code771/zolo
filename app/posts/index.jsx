@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { FlatList, View, Text, StyleSheet, Button } from "react-native";
+import {
+  FlatList,
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  ActivityIndicator,
+} from "react-native";
 import AddPost from "../../components/Addpost";
+import Post from "../../components/post";
 
 export default function Posts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
   useEffect(() => {
     async function fetchPosts() {
       const response = await fetch(
@@ -18,12 +27,7 @@ export default function Posts() {
     fetchPosts();
   }, []);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.item}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.body}>{item.body}</Text>
-    </View>
-  );
+  const renderItem = ({ item }) => <Post item={item} />;
 
   return (
     <View style={styles.container}>
@@ -56,6 +60,10 @@ const styles = StyleSheet.create({
   },
   list: {
     marginTop: 10,
+  },
+  delete: {
+    flex: 1,
+    alignItems: "flex-end",
   },
   item: {
     backgroundColor: "#fff",

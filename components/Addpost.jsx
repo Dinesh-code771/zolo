@@ -32,8 +32,8 @@ export default function AddPost({ visible, onClose }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            title,
-            body,
+            title:title,
+            body: body,
             userId: 1,
           }),
         }
