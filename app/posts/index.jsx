@@ -6,33 +6,52 @@ import {
   StyleSheet,
   Button,
   ActivityIndicator,
+
 } from "react-native";
+import { setSelectedPost } from "../../redux/postsSlice";
 import AddPost from "../../components/Addpost";
 import Post from "../../components/post";
-
+import { useDispatch } from "react-redux";
+import { setPostsToStore } from "../../redux/postsSlice";
 export default function Posts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteLoader, setDeleteLoader] = useState(false);
+  const dispatch = useDispatch();
   useEffect(() => {
     async function fetchPosts() {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/posts"
-      );
-      const data = await response.json();
-      setPosts(data);
-      setLoading(false);
+      try {
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/posts"
+        );
+        const data = await response.json();
+        // storing data in local or component state
+        setPosts(data);
+        // storing data in redux store (post slice)
+        dispatch(setPostsToStore({ payload: data }));
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
     }
     fetchPosts();
   }, []);
 
-  const renderItem = ({ item }) => <Post item={item} />;
+  const renderItem = ({ item }) => (
+    <Post item={item} setModalVisible={setModalVisible} />
+  );
 
   return (
     <View style={styles.container}>
       <Button title="Add Post" onPress={() => setModalVisible(true)} />
-      <AddPost visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <AddPost
+        visible={modalVisible}
+        onClose={() => {
+          setModalVisible(false);
+          dispatch(setSelectedPost({ id: 0, title: "", body: "" }));
+        }}
+      />
       {loading ? (
         <Text style={styles.loading}>Loading...</Text>
       ) : (

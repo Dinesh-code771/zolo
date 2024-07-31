@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   TextInput,
@@ -9,13 +9,41 @@ import {
   Modal,
   TouchableOpacity,
 } from "react-native";
+import { useSelector } from "react-redux";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 export default function AddPost({ visible, onClose }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const selectedPost = useSelector((state) => state.posts.selectedPost);
+  console.log(selectedPost, "selectedPost");
+  async function handleEditPost() {
+    // make fetch put request to update data
+    setIsSaving(true);
+    const res = await fetch(
+      `https://jsonplaceholder.typicode.com/posts/${selectedPost.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title,
+          body: body,
+          userId: selectedPost.id,
+        }),
+      }
+    );
+    const data = await res.json();
+    setIsSaving(false);
+    console.log(data, "data23");
+  }
 
   const handleSubmit = async () => {
+    if (selectedPost.id) {
+      return handleEditPost();
+    }
     if (!title || !body) {
       Alert.alert("Error", "Please fill out all fields");
       return;
@@ -32,7 +60,7 @@ export default function AddPost({ visible, onClose }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            title:title,
+            title: title,
             body: body,
             userId: 1,
           }),
@@ -50,6 +78,16 @@ export default function AddPost({ visible, onClose }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (selectedPost.id) {
+      setTitle(selectedPost.title);
+      setBody(selectedPost.body);
+    } else {
+      setTitle("");
+      setBody("");
+    }
+  }, [selectedPost]);
 
   return (
     <Modal
@@ -79,7 +117,15 @@ export default function AddPost({ visible, onClose }) {
             multiline
           />
           <Button
-            title={loading ? "Submitting..." : "Submit"}
+            title={
+              selectedPost.id > 0
+                ? isSaving
+                  ? "Saving..."
+                  : "Save"
+                : loading
+                ? "Submitting..."
+                : "Submit"
+            }
             onPress={handleSubmit}
             disabled={loading}
           />
