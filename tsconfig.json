@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/pducts.jsx", "app/index.jsx", "app/modal.jsx"  ]
+, "app/pducts.jsx", "app/index.jsx", "app/modal.jsx", "app/products/images.jsx"  ]
 }

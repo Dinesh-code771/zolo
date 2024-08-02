@@ -48,9 +48,9 @@ export default function Post({ item, setModalVisible }) {
           onPress={() => {
             editPost(item.id, item.title, item.body);
           }}
-          name="edit"
+          name="camera"
           size={20}
-          color="blue"
+          color="black"
         />
       </View>
       <Text style={styles.title}>{item.title}</Text>

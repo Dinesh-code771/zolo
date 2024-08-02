@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import RNPickerSelect from "react-native-picker-select";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -101,22 +100,22 @@ export default function Product() {
     dispatch(setIsEditMode(true));
   }
 
-  async function selectImage() {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-      if (!result.canceled) {
-        console.log(result); // Logging the result to debug
-        setImageUri(result.assets[0].uri); // Accessing the URI of the selected image
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // async function selectImage() {
+  //   try {
+  //     const result = await ImagePicker.launchImageLibraryAsync({
+  //       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //       allowsEditing: true,
+  //       aspect: [4, 3],
+  //       quality: 1,
+  //     });
+  //     if (!result.canceled) {
+  //       console.log(result); // Logging the result to debug
+  //       setImageUri(result.assets[0].uri); // Accessing the URI of the selected image
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   const handleDelete = (productId) => {
     let newProducts = products.filter((product) => {
@@ -202,7 +201,12 @@ export default function Product() {
         title={`${isFormOpen ? "Close Form" : "Add Product"}`}
         onPress={handleAddProduct}
       />
-      <Button title="Select Image" onPress={selectImage} />
+      <Button
+        title="Go to Images"
+        onPress={() => {
+          navigation.navigate("products/images");
+        }}
+      />
       <Button
         title="Post screen"
         onPress={() => {

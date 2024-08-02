@@ -33,6 +33,10 @@ export default function RootLayout() {
               name="products/[productId]"
               options={{ title: "product" }}
             />
+            <Stack.Screen
+              name="products/images"
+              options={{ title: "Images" }}
+            />
             <Stack.Screen name="posts/index" options={{ title: "Posts" }} />
             <Stack.Screen name="users" options={{ headerShown: false }} />
             <Stack.Screen
