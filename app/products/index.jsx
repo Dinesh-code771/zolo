@@ -131,6 +131,10 @@ export default function Product() {
       return product.title.toLowerCase().includes(convertedSearchValue);
     });
     setFilteredProducts(newSearchedProducts);
+
+    return () => {
+      console.log("un mount");
+    };
   }, [searchValue, products]);
 
   useEffect(() => {
