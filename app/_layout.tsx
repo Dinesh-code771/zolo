@@ -28,13 +28,13 @@ export default function RootLayout() {
           >
             <Stack.Screen name="index" options={{ title: "Login" }} />
             <Stack.Screen name="details" options={{ headerShown: true }} />
-            <Stack.Screen name="products/index" options={{ title: "ZOLO" }} />
+            <Stack.Screen name="home/index" options={{ title: "ZOLO" }} />
             <Stack.Screen
-              name="products/[productId]"
+              name="home/[categoryID]"
               options={{ title: "product" }}
             />
             <Stack.Screen
-              name="products/images"
+              name="home/images"
               options={{ title: "Images" }}
             />
             <Stack.Screen name="posts/index" options={{ title: "Posts" }} />

@@ -62,7 +62,7 @@ export default function Index() {
 
       setName("");
       setPassword("");
-      navigation.navigate("products/index");
+      navigation.navigate("home/index");
     }
   }
   // check if user is already logged in
