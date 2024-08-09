@@ -1,6 +1,7 @@
 import { View, Platform, TextInput, Button } from "react-native";
 import { Link, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import Icon from "react-native-vector-icons/MaterialIcons";
 import { useEffect, useRef } from "react";
 export default function Modal() {
   const inputRef = useRef(null); // Initialize useRef with null

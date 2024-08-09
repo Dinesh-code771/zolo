@@ -8,9 +8,33 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import Swiper from "react-native-swiper";
+import { setSelectedProduct } from "../../redux/productsSlice";
 
 export default function Product() {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const categoryData = [
+    {
+      name: "mobiles",
+      image: require(`../../assets/images/mobile.jpeg`),
+    },
+    {
+      name: "Fashion",
+      image: require(`../../assets/images/fashion.jpeg`),
+    },
+    {
+      name: "Home",
+      image: require(`../../assets/images/home.jpeg`),
+    },
+    {
+      name: "Beauty",
+      image: require(`../../assets/images/beauty.jpeg`),
+    },
+  ];
   const selectImage = () => {
     // Your image selection logic here
   };
@@ -90,26 +114,85 @@ export default function Product() {
       {/* banner container */}
       <View
         style={{
-          backgroundColor: "#c8f0e5",
+          height: 400,
+          width: "100%",
+          marginBottom: 10,
         }}
       >
-        <Image
-          style={{
-            width: "100%",
-            height: 200,
-            resizeMode: "cover",
-          }}
-          source={require("../../assets/images/banner1.jpeg")}
-        />
-        <Image
-          style={{
-            width: "100%",
-            height: 200,
-            resizeMode: "cover",
-          }}
-          source={require("../../assets/images/banner2.jpeg")}
-        />
+        <Swiper
+          style={styles.wrapper}
+          showsButtons={false}
+          autoplay={true}
+          loop={true}
+        >
+          <View
+            style={{
+              backgroundColor: "#c8f0e5",
+              flex: 1,
+            }}
+          >
+            <Image
+              style={{
+                width: "100%",
+                height: "100%",
+                resizeMode: "cover",
+              }}
+              source={require("../../assets/images/banner1.jpeg")}
+            />
+          </View>
+          <View
+            style={{
+              backgroundColor: "#c8f0e5",
+              flex: 1,
+            }}
+          >
+            <Image
+              style={{
+                width: "100%",
+                height: 200,
+                resizeMode: "cover",
+              }}
+              source={require("../../assets/images/banner2.jpeg")}
+            />
+          </View>
+        </Swiper>
+        {/* swiper 2 */}
+        <Swiper
+          showsButtons={false}
+          autoplay={true}
+          style={styles.wrapper}
+          showsButtons={false}
+          autoplay={true}
+          loop={true}
+        >
+          <View
+            style={{
+              backgroundColor: "#c8f0e5",
+              flex: 1,
+            }}
+          >
+            <Image
+              style={{
+                width: "100%",
+                height: 200,
+                resizeMode: "cover",
+              }}
+              source={require("../../assets/images/banner3.jpeg")}
+            />
+          </View>
+          <View>
+            <Image
+              style={{
+                width: "100%",
+                height: 200,
+                resizeMode: "cover",
+              }}
+              source={require("../../assets/images/banner4.jpeg")}
+            />
+          </View>
+        </Swiper>
       </View>
+
       {/* category container */}
       <ScrollView
         contentContainerStyle={{
@@ -119,20 +202,25 @@ export default function Product() {
         <View style={styles.categoryContainer}>
           <Text style={styles.headerText}>Recently Viewed Categories</Text>
           <View style={styles.row}>
-            <View style={styles.card}>
-              <Image
-                style={styles.image}
-                source={require("../../assets/images/mobile.jpeg")}
-              />
-              <Text style={styles.cardText}>Electronics</Text>
-            </View>
-            <View style={styles.card}>
-              <Image
-                style={styles.image}
-                source={require("../../assets/images/mobile.jpeg")}
-              />
-              <Text style={styles.cardText}>Electronics</Text>
-            </View>
+            {
+              // Loop through the category data and display the cards
+              categoryData.map((category, index) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(setSelectedProduct(category.name));
+                    // Navigate to the category page
+                    navigation.navigate("home/[categoryID]", {
+                      categoryID: category.name,
+                    });
+                  }}
+                >
+                  <View style={styles.card} key={index}>
+                    <Image style={styles.image} source={category.image} />
+                    <Text style={styles.cardText}>{category.name}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            }
           </View>
         </View>
       </ScrollView>
@@ -180,16 +268,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   row: {
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+    flexWrap: "wrap",
+    gap: 10,
   },
   card: {
     flex: 1,
     padding: 5,
     alignItems: "center",
     marginHorizontal: 5,
-    backgroundColor:"#f8f8f8"
+    backgroundColor: "#f8f8f8",
   },
   image: {
     width: 60,

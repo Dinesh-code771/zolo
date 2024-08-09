@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   products: [],
   isEditMode: false,
+  selectedProduct: "",
 };
 
 const productSlice = createSlice({
@@ -15,8 +16,12 @@ const productSlice = createSlice({
     setIsEditMode(state, action) {
       state.isEditMode = action.payload;
     },
+    setSelectedProduct(state, action) {
+      state.selectedProduct = action.payload;
+    },
   },
 });
 
-export const { setProducts, setIsEditMode } = productSlice.actions;
+export const { setProducts, setIsEditMode, setSelectedProduct } =
+  productSlice.actions;
 export default productSlice.reducer;
