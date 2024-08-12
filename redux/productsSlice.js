@@ -4,6 +4,7 @@ const initialState = {
   products: [],
   isEditMode: false,
   selectedProduct: "",
+  selectedProductData: "",
 };
 
 const productSlice = createSlice({
@@ -19,9 +20,16 @@ const productSlice = createSlice({
     setSelectedProduct(state, action) {
       state.selectedProduct = action.payload;
     },
+    setSelectedProductData(state, action) {
+      state.selectedProductData = action.payload;
+    },
   },
 });
 
-export const { setProducts, setIsEditMode, setSelectedProduct } =
-  productSlice.actions;
+export const {
+  setSelectedProductData,
+  setProducts,
+  setIsEditMode,
+  setSelectedProduct,
+} = productSlice.actions;
 export default productSlice.reducer;

@@ -15,18 +15,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { setProducts } from "../../redux/productsSlice";
 import { useRouter, useSearchParams } from "expo-router";
 import { products } from "../../data/productsData";
+import { useNavigation } from "@react-navigation/native";
+import { setSelectedProductData } from "../../redux/productsSlice";
 export default function ProductDetails() {
   // state to store the selected product data
-  const [selectedProductData, setSelectedProductData] = useState([]);
+  const [selectedProductData, setSelectedProductStateData] = useState([]);
   // to get the selected product from the redux store
   const selectedProduct = useSelector(
     (state) => state.products.selectedProduct
   );
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const navigation = useNavigation();
 
   // to get the selected product data
   useEffect(() => {
-    setSelectedProductData(products[selectedProduct]);
-  });
+    setSelectedProductStateData(products[selectedProduct]);
+  }, []);
 
   // to navigate to the cart screen
   return (
@@ -118,9 +123,40 @@ export default function ProductDetails() {
                   <Text style={{ fontSize: 20, fontWeight: "bold" }}>
                     ₹ {product.price}
                   </Text>
-                  <TouchableOpacity>
-                    <Button title="Add to Cart" color="orange"></Button>
-                  </TouchableOpacity>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: "row",
+                      gap: 10,
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        flex: 1,
+                        borderCurve: 5,
+                      }}
+                    >
+                      <Button
+                        title="view"
+                        onPress={() => {
+                          dispatch(setSelectedProductData(product));
+                          // navigate to the product details page
+                          navigation.navigate("home/[productID]", {
+                            productID: product.name,
+                          });
+                        }}
+                        color="#55AAFF"
+                      ></Button>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{
+                        flex: 1,
+                      }}
+                    >
+                      <Button title="Add to Cart" color="orange"></Button>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             );

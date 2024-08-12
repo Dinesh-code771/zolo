@@ -161,7 +161,6 @@ export default function Product() {
           showsButtons={false}
           autoplay={true}
           style={styles.wrapper}
-          showsButtons={false}
           autoplay={true}
           loop={true}
         >

@@ -73,7 +73,7 @@ export default function Index() {
       console.log(savedUser, password);
       if (savedUser && password) {
         console.log("entered");
-        navigation.navigate("products/index");
+        navigation.navigate("home/index");
       }
     }
     getLoginDetails();
