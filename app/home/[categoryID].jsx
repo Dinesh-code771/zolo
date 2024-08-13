@@ -19,6 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import { setSelectedProductData } from "../../redux/productsSlice";
 export default function ProductDetails() {
   // state to store the selected product data
+  const allProducts = useSelector((state) => state.products.allProducts);
   const [selectedProductData, setSelectedProductStateData] = useState([]);
   // to get the selected product from the redux store
   const selectedProduct = useSelector(
@@ -30,8 +31,8 @@ export default function ProductDetails() {
 
   // to get the selected product data
   useEffect(() => {
-    setSelectedProductStateData(products[selectedProduct]);
-  }, []);
+    setSelectedProductStateData(allProducts[selectedProduct]);
+  }, [allProducts]);
 
   // to navigate to the cart screen
   return (
@@ -74,6 +75,7 @@ export default function ProductDetails() {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.productListContainer}>
           {selectedProductData.map((product, index) => {
+            console.log(product.image, "product");
             return (
               <View key={index} style={styles.productContainer}>
                 {/* image container */}

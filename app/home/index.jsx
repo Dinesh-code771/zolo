@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,8 @@ import { useDispatch } from "react-redux";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Swiper from "react-native-swiper";
 import { setSelectedProduct } from "../../redux/productsSlice";
-
+import { setAllProducts } from "../../redux/productsSlice";
+import { products } from "../../data/productsData";
 export default function Product() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -38,6 +39,11 @@ export default function Product() {
   const selectImage = () => {
     // Your image selection logic here
   };
+
+  //store my products data inside redux
+  useEffect(() => {
+    dispatch(setAllProducts(products));
+  }, []);
 
   return (
     <View style={styles.container}>

@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   products: [],
+  allProducts: [],
   isEditMode: false,
   selectedProduct: "",
   selectedProductData: "",
@@ -23,6 +24,9 @@ const productSlice = createSlice({
     setSelectedProductData(state, action) {
       state.selectedProductData = action.payload;
     },
+    setAllProducts(state, action) {
+      state.allProducts = action.payload;
+    },
   },
 });
 
@@ -31,5 +35,6 @@ export const {
   setProducts,
   setIsEditMode,
   setSelectedProduct,
+  setAllProducts,
 } = productSlice.actions;
 export default productSlice.reducer;

@@ -8,21 +8,45 @@ import {
   Button,
 } from "react-native";
 import { useSelector } from "react-redux";
+import { setSelectedProductData } from "../../redux/productsSlice";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
+import { useDispatch } from "react-redux";
+import { setAllProducts } from "../../redux/productsSlice";
+import { products } from "../../data/productsData";
 export default function ProductID() {
+  const dispatch = useDispatch();
   const selectedProductData = useSelector(
     (state) => state.products.selectedProductData
   );
-
+  const selectedProduct = useSelector(
+    (state) => state.products.selectedProduct
+  );
+  const allProducts = useSelector((state) => state.products.allProducts);
+  function updateQuantity() {
+    console.log(allProducts[selectedProduct], "all");
+    const updateDAta = allProducts[selectedProduct].map((product) => {
+      if (product.name === selectedProductData.name) {
+        console.log(product.quantity ? product.quantity + 1 : 0, "pro");
+        return {
+          ...product,
+          quantity: product.quantity ? product.quantity + 1 : 0,
+        };
+      } else {
+        return product;
+      }
+    });
+    dispatch(
+      setAllProducts({
+        ...allProducts,
+        [selectedProduct]: updateDAta,
+      })
+    );
+  }
   return (
     <View style={styles.container}>
       {/* Image container */}
       <View style={styles.imageContainer}>
-        <Image
-          style={styles.productImage}
-          source={require(`../../assets/images/mobile1.jpeg`)}
-        />
+        <Image style={styles.productImage} source={selectedProductData.image} />
       </View>
 
       {/* Product details container */}
@@ -44,8 +68,23 @@ export default function ProductID() {
             <TouchableOpacity>
               <Icon name="remove" size={24} color="#333" />
             </TouchableOpacity>
-            <Text style={styles.quantityText}>1</Text>
-            <TouchableOpacity>
+            <Text style={styles.quantityText}>
+              {selectedProductData.quantity ? selectedProductData.quantity : 0}
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                dispatch(
+                  setSelectedProductData({
+                    ...selectedProductData,
+                    quantity:
+                      (selectedProductData.quantity
+                        ? selectedProductData.quantity
+                        : 0) + 1,
+                  })
+                );
+                updateQuantity();
+              }}
+            >
               <Icon name="add" size={24} color="#333" />
             </TouchableOpacity>
           </View>
