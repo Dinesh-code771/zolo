@@ -5,6 +5,7 @@ const initialState = {
   allProducts: [],
   isEditMode: false,
   selectedProduct: "",
+  cartItems: [],
   selectedProductData: "",
 };
 
@@ -27,6 +28,9 @@ const productSlice = createSlice({
     setAllProducts(state, action) {
       state.allProducts = action.payload;
     },
+    setCartItems(state, action) {
+      state.cartItems = action.payload;
+    },
   },
 });
 
@@ -36,5 +40,6 @@ export const {
   setIsEditMode,
   setSelectedProduct,
   setAllProducts,
+  setCartItems,
 } = productSlice.actions;
 export default productSlice.reducer;

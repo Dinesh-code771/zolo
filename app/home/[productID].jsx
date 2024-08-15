@@ -13,6 +13,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
 import { setAllProducts } from "../../redux/productsSlice";
 import { products } from "../../data/productsData";
+import { setCartItems } from "../../redux/productsSlice";
 export default function ProductID() {
   const dispatch = useDispatch();
   const selectedProductData = useSelector(
@@ -21,26 +22,79 @@ export default function ProductID() {
   const selectedProduct = useSelector(
     (state) => state.products.selectedProduct
   );
+  const cartITems = useSelector((state) => state.products.cartItems);
   const allProducts = useSelector((state) => state.products.allProducts);
-  function updateQuantity() {
-    console.log(allProducts[selectedProduct], "all");
-    const updateDAta = allProducts[selectedProduct].map((product) => {
-      if (product.name === selectedProductData.name) {
-        console.log(product.quantity ? product.quantity + 1 : 0, "pro");
-        return {
-          ...product,
-          quantity: product.quantity ? product.quantity + 1 : 0,
-        };
-      } else {
-        return product;
-      }
+  // function updateQuantity() {
+  //   console.log(allProducts[selectedProduct], "all");
+  //   const updateDAta = allProducts[selectedProduct].map((product) => {
+  //     if (product.name === selectedProductData.name) {
+  //       console.log(product.quantity ? product.quantity + 1 : 0, "pro");
+  //       return {
+  //         ...product,
+  //         quantity: product.quantity !== undefined ? product.quantity + 1 : 0,
+  //       };
+  //     } else {
+  //       return product;
+  //     }
+  //   });
+  //   console.log(updateDAta, "update", selectedProductData.name);
+  //   dispatch(
+  //     setAllProducts({
+  //       ...allProducts,
+  //       [selectedProduct]: updateDAta,
+  //     })
+  //   );
+  // }
+  // function decressQuantity() {
+  //   console.log(allProducts[selectedProduct], "all");
+  //   const updateDAta = allProducts[selectedProduct].map((product) => {
+  //     if (product.name === selectedProductData.name) {
+  //       console.log(product.quantity ? product.quantity + 1 : 0, "pro");
+  //       return {
+  //         ...product,
+  //         quantity: product.quantity !== undefined ? product.quantity - 1 : 0,
+  //       };
+  //     } else {
+  //       return product;
+  //     }
+  //   });
+  //   console.log(updateDAta, "update", selectedProductData.name);
+  //   dispatch(
+  //     setAllProducts({
+  //       ...allProducts,
+  //       [selectedProduct]: updateDAta,
+  //     })
+  //   );
+  // }
+
+  //remove product ffrom cart
+  function removeProductFromCart() {
+    let updateCartItems = cartITems.filter((item) => {
+      return item.name !== selectedProductData.name;
     });
-    dispatch(
-      setAllProducts({
-        ...allProducts,
-        [selectedProduct]: updateDAta,
-      })
-    );
+    dispatch(setCartItems(updateCartItems));
+  }
+ 
+
+  //function to check item present in cart
+  function checkIsProductAlreadyPresent() {
+    let product = cartITems.find((item) => {
+      return item.name === selectedProductData.name;
+    });
+    if (product) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // adding products to cart
+  function tohandleAddToCart() {
+    if (checkIsProductAlreadyPresent()) {
+      return removeProductFromCart();
+    }
+    console.log(cartITems, "dsdf");
+    dispatch(setCartItems([...cartITems, selectedProductData]));
   }
   return (
     <View style={styles.container}>
@@ -64,8 +118,21 @@ export default function ProductID() {
         {/* Buttons */}
         <View style={styles.buttonsContainer}>
           {/* Quantity container */}
-          <View style={styles.quantityContainer}>
-            <TouchableOpacity>
+          {/* <View style={styles.quantityContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                dispatch(
+                  setSelectedProductData({
+                    ...selectedProductData,
+                    quantity:
+                      (selectedProductData.quantity
+                        ? selectedProductData.quantity
+                        : 0) - 1,
+                  })
+                );
+                decressQuantity();
+              }}
+            >
               <Icon name="remove" size={24} color="#333" />
             </TouchableOpacity>
             <Text style={styles.quantityText}>
@@ -86,6 +153,44 @@ export default function ProductID() {
               }}
             >
               <Icon name="add" size={24} color="#333" />
+            </TouchableOpacity>
+          </View> */}
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              alignItems: "center",
+              borderWidth: 1,
+              borderColor: "orange",
+              backgroundColor: checkIsProductAlreadyPresent()
+                ? "red"
+                : "orange",
+              borderRadius: 5,
+
+              justifyContent: "center",
+              marginRight: 20,
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                borderRadius: 5,
+              }}
+              onPress={() => {
+                tohandleAddToCart();
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontWeight: 500,
+                  color: checkIsProductAlreadyPresent() ? "white" : "black",
+                }}
+              >
+                {checkIsProductAlreadyPresent()
+                  ? "Remove from cart "
+                  : "Add to carrt"}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -143,11 +248,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "orange",
+    backgroundColor: "orange",
     borderRadius: 5,
-    padding: 10,
-    backgroundColor: "#f8f8f8",
-    justifyContent: "space-between",
+    justifyContent: "center",
     marginRight: 20,
   },
   quantityText: {

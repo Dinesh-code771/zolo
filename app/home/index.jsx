@@ -15,6 +15,7 @@ import Swiper from "react-native-swiper";
 import { setSelectedProduct } from "../../redux/productsSlice";
 import { setAllProducts } from "../../redux/productsSlice";
 import { products } from "../../data/productsData";
+import { useSelector } from "react-redux";
 export default function Product() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -38,7 +39,9 @@ export default function Product() {
   ];
   const selectImage = () => {
     // Your image selection logic here
+    navigation.navigate("home/cart");
   };
+  const cartITems = useSelector((state) => state.products.cartItems);
 
   //store my products data inside redux
   useEffect(() => {
@@ -70,7 +73,15 @@ export default function Product() {
               source={require("../../assets/images/amozon.png")}
             />
           </View>
-          <TouchableOpacity onPress={selectImage}>
+          <TouchableOpacity style={{}} onPress={selectImage}>
+            <Text
+              style={{
+                color: "black",
+                fontSize: 16,
+              }}
+            >
+              {cartITems.length ? cartITems.length : 0}
+            </Text>
             <Icon
               name="shopping-cart"
               size={30}
@@ -167,7 +178,6 @@ export default function Product() {
           showsButtons={false}
           autoplay={true}
           style={styles.wrapper}
-          autoplay={true}
           loop={true}
         >
           <View

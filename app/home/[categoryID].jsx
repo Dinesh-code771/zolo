@@ -17,6 +17,7 @@ import { useRouter, useSearchParams } from "expo-router";
 import { products } from "../../data/productsData";
 import { useNavigation } from "@react-navigation/native";
 import { setSelectedProductData } from "../../redux/productsSlice";
+import { setCartItems } from "../../redux/productsSlice";
 export default function ProductDetails() {
   // state to store the selected product data
   const allProducts = useSelector((state) => state.products.allProducts);
@@ -25,6 +26,7 @@ export default function ProductDetails() {
   const selectedProduct = useSelector(
     (state) => state.products.selectedProduct
   );
+  const cartITems = useSelector((state) => state.products.cartItems);
   const dispatch = useDispatch();
   const router = useRouter();
   const navigation = useNavigation();
@@ -33,6 +35,11 @@ export default function ProductDetails() {
   useEffect(() => {
     setSelectedProductStateData(allProducts[selectedProduct]);
   }, [allProducts]);
+
+
+  useEffect(() => {
+    console.log(cartITems, "cart");
+  }, [cartITems]);
 
   // to navigate to the cart screen
   return (
