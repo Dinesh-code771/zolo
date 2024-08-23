@@ -9,10 +9,56 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { setCartItems } from "../../redux/productsSlice";
+import { useDispatch } from "react-redux";
 export default function CartPage() {
   // Select the cart items from the Redux store
   const cartItems = useSelector((state) => state.products.cartItems);
 
+  const dispatch = useDispatch();
+  function updateQuantityforCart(name) {
+    const updateDAta = cartItems.map((product) => {
+      if (product.name === name) {
+        return {
+          ...product,
+          quantity: product.quantity !== undefined ? product.quantity + 1 : 2,
+        };
+      } else {
+        return product;
+      }
+    });
+    dispatch(setCartItems(updateDAta));
+  }
+  function deleteQuantityforCart(name) {
+    const updateDAta = cartItems.map((product) => {
+      if (product.name === name) {
+        if (product.quantity === 0) {
+          return product;
+        }
+        return {
+          ...product,
+          quantity: product.quantity !== undefined ? product.quantity - 1 : 0,
+        };
+      } else {
+        return product;
+      }
+    });
+    dispatch(setCartItems(updateDAta));
+  }
+  function removeItemFromCart(name) {
+    const updateDAta = cartItems.filter((product) => {
+      if (product.name === name) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+    dispatch(setCartItems(updateDAta));
+  }
+
+  function clearCart() {
+    dispatch(setCartItems([]));
+  }
   // Render each item in the cart
   const renderItem = ({ item }) => (
     <View style={styles.itemContainerWraper}>
@@ -39,19 +85,23 @@ export default function CartPage() {
               backgroundColor: "#f5f8f7",
               padding: 5,
             }}
-            onPress={() => {}}
+            onPress={() => {
+              deleteQuantityforCart(item.name);
+            }}
           >
             <Icon name="delete" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.quantityText}>
-            {item.quantity ? item.quantity : 0}
+            {item.quantity ? item.quantity : 1}
           </Text>
           <TouchableOpacity
             style={{
               backgroundColor: "#f5f8f7",
               padding: 5,
             }}
-            onPress={() => {}}
+            onPress={() => {
+              updateQuantityforCart(item.name);
+            }}
           >
             <Icon name="add" size={24} color="#333" />
           </TouchableOpacity>
@@ -67,7 +117,9 @@ export default function CartPage() {
             borderColor: "#e7e9eb",
             borderWidth: 1,
           }}
-          onPress={() => {}}
+          onPress={() => {
+            removeItemFromCart(item.name);
+          }}
         >
           <Text>Delete</Text>
         </TouchableOpacity>
@@ -100,6 +152,86 @@ export default function CartPage() {
       ) : (
         <Text style={styles.emptyMessage}>Your cart is empty.</Text>
       )}
+      {/* //checkout container */}
+      {cartItems.length > 0 ? (
+        <View style={{ marginTop: 20 }}>
+          <View
+            style={{
+              flexDirection: "column",
+              backgroundColor: "white",
+              padding: 6,
+              borderRadius: 8,
+              borderColor: "#e7e9eb",
+              borderWidth: 1,
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+              marginHorizontal: 10,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: 10,
+              }}
+            >
+              <Text style={{ fontSize: 18, marginRight: 10, paddingLeft: 10 }}>
+                Total:
+              </Text>
+              <Text style={{ fontSize: 18 }}>
+                $
+                {cartItems
+                  .reduce((acc, item) => {
+                    return (
+                      acc + item.price * (item.quantity ? item.quantity : 1)
+                    );
+                  }, 0)
+                  .toFixed(2)}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={{
+                backgroundColor: "orange",
+                padding: 10,
+                borderRadius: 5,
+                justifyContent: "center",
+                alignItems: "center",
+                marginLeft: 20,
+                marginBottom: 10,
+              }}
+              onPress={() => {}}
+            >
+              <Text style={{ color: "white" }}>Checkout</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                backgroundColor: "white",
+                padding: 10,
+                borderRadius: 5,
+                justifyContent: "center",
+                alignItems: "center",
+                marginLeft: 20,
+                borderColor: "#e7e9eb",
+                borderWidth: 1,
+              }}
+              onPress={clearCart}
+            >
+              <Text>Clear Cart</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
+        ""
+      )}
     </View>
   );
 }
@@ -107,7 +239,6 @@ export default function CartPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: "#fff",
     gap: 30,
   },
@@ -124,7 +255,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     backgroundColor: "#f9f9f9",
-    paddingVertical: 10,
+    padding: 16,
   },
   image: {
     width: 170,

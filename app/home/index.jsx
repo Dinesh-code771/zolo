@@ -16,10 +16,32 @@ import { setSelectedProduct } from "../../redux/productsSlice";
 import { setAllProducts } from "../../redux/productsSlice";
 import { products } from "../../data/productsData";
 import { useSelector } from "react-redux";
+
+let staticCategoryData = [
+  {
+    name: "mobiles",
+    image: require(`../../assets/images/mobile.jpeg`),
+  },
+  {
+    name: "Fashion",
+    image: require(`../../assets/images/fashion.jpeg`),
+  },
+  {
+    name: "Home",
+    image: require(`../../assets/images/home.jpeg`),
+  },
+  {
+    name: "Beauty",
+    image: require(`../../assets/images/beauty.jpeg`),
+  },
+];
+
 export default function Product() {
   const navigation = useNavigation();
+  const [searchCategory, setSearchCategory] = React.useState("");
+  
   const dispatch = useDispatch();
-  const categoryData = [
+  const [categoryData, setCategoryData] = React.useState([
     {
       name: "mobiles",
       image: require(`../../assets/images/mobile.jpeg`),
@@ -36,7 +58,8 @@ export default function Product() {
       name: "Beauty",
       image: require(`../../assets/images/beauty.jpeg`),
     },
-  ];
+  ]);
+
   const selectImage = () => {
     // Your image selection logic here
     navigation.navigate("home/cart");
@@ -48,6 +71,15 @@ export default function Product() {
     dispatch(setAllProducts(products));
   }, []);
 
+  // to seach the category
+  useEffect(() => {
+    const searchedCategories = staticCategoryData.filter((category) => {
+      if (category.name.toLowerCase().includes(searchCategory.toLowerCase())) {
+        return category;
+      }
+    });
+    setCategoryData(searchedCategories);
+  }, [searchCategory]);
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -108,6 +140,8 @@ export default function Product() {
               marginLeft: 10,
             }}
             placeholder="Search"
+            value={searchCategory}
+            onChangeText={(text) => setSearchCategory(text)}
           ></TextInput>
           <Icon name="mic" size={20} color="black" />
         </View>
